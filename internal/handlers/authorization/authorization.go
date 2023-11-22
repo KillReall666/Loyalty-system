@@ -1,4 +1,4 @@
-package authentication
+package authorization
 
 import (
 	"bytes"
@@ -8,26 +8,32 @@ import (
 	"fmt"
 	"github.com/KillReall666/Loyalty-system/internal/authentication"
 	"github.com/KillReall666/Loyalty-system/internal/credentials"
+	"github.com/KillReall666/Loyalty-system/internal/logger"
+	"github.com/KillReall666/Loyalty-system/internal/storage/redis"
 	"net/http"
 	"time"
 )
 
 type AuthHandler struct {
-	checkUser CredentialsChecker
+	checkUser   CredentialsChecker
+	RedisClient *redis.RedisClient
+	log         *logger.Logger
 }
 
 type CredentialsChecker interface {
-	CheckCredentials(ctx context.Context, user string) (error, string, int)
+	CredentialsGetter(ctx context.Context, user string) (string, string, error)
 }
 
-func NewAuthenticationHandler(ch CredentialsChecker) *AuthHandler {
+func NewAuthorizationHandler(ch CredentialsChecker, redis *redis.RedisClient, log *logger.Logger) *AuthHandler {
 	return &AuthHandler{
-		checkUser: ch,
+		checkUser:   ch,
+		RedisClient: redis,
+		log:         log,
 	}
 }
 
 // AuthenticationHandler TODO: Скорее всего это должен быть мидлтварь
-func (a *AuthHandler) AuthenticationHandler(w http.ResponseWriter, r *http.Request) {
+func (a *AuthHandler) AuthorizationHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "only POST requests support!", http.StatusNotFound)
 		return
@@ -49,20 +55,29 @@ func (a *AuthHandler) AuthenticationHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err, hashPasswordFromDb, id := a.checkUser.CheckCredentials(ctx, user.Username)
+	hashPasswordFromDb, id, err := a.checkUser.CredentialsGetter(ctx, user.Username)
 	if err != nil {
-		fmt.Println(err)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
 	}
 
 	var token string
 	if user.ComparePassword(hashPasswordFromDb, user.PasswordHash) {
-		fmt.Println("Correct password")
 		token, err = authentication.BuildJWTString(id)
 		w.Header().Set("Authorization", token)
+		err = a.RedisClient.Set(id, token)
+		if err != nil {
+			a.log.LogWarning("err when set value to redis in auth handler:", err)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		//Надо ли?
 		fmt.Fprintf(w, "You have successfully authorized")
+		a.log.LogInfo("user", id, "successfully authorized")
 	} else {
 		err = errors.New("incorrect password, please try again")
 		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
 	}
 
 }

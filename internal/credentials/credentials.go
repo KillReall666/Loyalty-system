@@ -1,12 +1,12 @@
-package model
+package credentials
 
 import (
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	Username     string
-	PasswordHash string
+	Username     string `json:"login"`
+	PasswordHash string `json:"password"`
 }
 
 func (u *User) SetPassword(password string) error {
@@ -18,26 +18,7 @@ func (u *User) SetPassword(password string) error {
 	return nil
 }
 
-func (u *User) ComparePassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password))
+func (u *User) ComparePassword(hashedPasswordFromDb, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPasswordFromDb), []byte(password))
 	return err == nil
 }
-
-/*
-Сет юзер
-user := User{
-    Username: "example_user",
-}
-err := user.SetPassword("example_password")
-if err != nil {
-    panic(err)
-}
-
-
-Проверка пароля
-if user.ComparePassword("example_password") {
-    fmt.Println("Пароль верен")
-} else {
-    fmt.Println("Пароль неверен")
-}
-*/

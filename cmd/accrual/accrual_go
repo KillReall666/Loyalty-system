@@ -1,0 +1,2 @@
+#!/bin/bash
+./accrual_darwin_amd64 -a "localhost:8888" -d "localhost:5432"-r "localhost:1488"

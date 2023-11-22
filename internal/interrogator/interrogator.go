@@ -1,9 +1,8 @@
-package _interrogator
+package interrogator
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/KillReall666/Loyalty-system/internal/storage/postgres"
@@ -23,28 +22,40 @@ func NewInterrogator(db *postgres.Database, log *logger.Logger) *Interrogator {
 	}
 }
 
-func (i *Interrogator) OrderStatusWorker(orderNumber string) {
-	status, err := i.GetOrderStatusFromACCRUAL(orderNumber)
+func (i *Interrogator) OrderStatusWorker() {
+	orders, err := i.db.GetOrderNumbers(context.Background())
 	if err != nil {
-		i.log.LogWarning("Error retrieving order status from ACCRUAL: %v\n", err)
-		return
+		i.log.LogWarning("err when getting orders list from db: ", err)
 	}
-
-	switch status {
-	case "PROCESSED":
-		// Переместить заказ в базу данных с новым статусом (например, PROCESSED)
-		i.UpdateOrderStatusInDB(orderNumber, "PROCESSED")
-	case "INVALID":
-		// Переместить заказ в базу данных с новым статусом (например, INVALID)
-		i.UpdateOrderStatusInDB(orderNumber, "INVALID")
-	default:
-		// Пока заказ имеет статус отличный от PROCESSED и INVALID,
-		// считаем его обработаным в ACCRUAL, и ничего не делаем
-		fmt.Println("Order is still being processed in ACCRUAL")
+	for j := 0; j < len(orders); j++ {
+		status, accrual, err := i.GetOrderStatusFromACCRUAL(orders[j])
+		if err != nil {
+			i.log.LogWarning("Error retrieving order status from ACCRUAL: %v\n", err)
+			return
+		}
+		switch status {
+		case "PROCESSED":
+			// Переместить заказ в базу данных с новым статусом (PROCESSED)
+			userId := i.UpdateOrderStatusInDB(orders[j], "PROCESSED", accrual)
+			err = i.db.IncrementCurrent(context.Background(), userId, accrual)
+			if err != nil {
+				i.log.LogWarning("err when add user balance: ", err)
+			}
+		case "INVALID":
+			// Переместить заказ в базу данных с новым статусом (INVALID)
+			userId := i.UpdateOrderStatusInDB(orders[j], "INVALID", accrual)
+			err = i.db.IncrementCurrent(context.Background(), userId, accrual)
+			if err != nil {
+				i.log.LogWarning("err when add user balance: ", err)
+			}
+		default:
+			// Пока заказ имеет статус отличный от PROCESSED и INVALID,
+			i.log.LogInfo("Order is still being processed in ACCRUAL")
+		}
 	}
 }
 
-func (i *Interrogator) GetOrderStatusFromACCRUAL(orderNumber string) (string, error) {
+func (i *Interrogator) GetOrderStatusFromACCRUAL(orderNumber string) (string, float32, error) {
 	req, err := http.NewRequest("GET", "http://localhost:8888/api/orders/"+orderNumber, nil)
 	if err != nil {
 		i.log.LogWarning("err when create GET request: ", err)
@@ -66,15 +77,17 @@ func (i *Interrogator) GetOrderStatusFromACCRUAL(orderNumber string) (string, er
 	err = json.Unmarshal(body, &order)
 	if err != nil {
 		i.log.LogWarning("err when parse JSON:", err)
-		return "", err
+		return "", 0, err
 	}
-	return order.OrderStatus, nil
+	return order.OrderStatus, order.Accrual, nil
 }
 
-func (i *Interrogator) UpdateOrderStatusInDB(orderNumber string, newStatus string) {
-	err := i.db.StatusSetter(context.Background(), orderNumber, newStatus)
+// UpdateOrderStatusInDB TODO: что делать с контекстом?
+func (i *Interrogator) UpdateOrderStatusInDB(orderNumber string, newStatus string, accrual float32) string {
+	userId, err := i.db.StatusSetter(context.Background(), orderNumber, newStatus, accrual)
 	if err != nil {
 		i.log.LogWarning("err when trying update order status", err)
 	}
-	fmt.Printf("Order %s updated in the database with status %s\n", orderNumber, newStatus)
+	i.log.LogInfo("Order", orderNumber, "updated in the database with status", newStatus)
+	return userId
 }
