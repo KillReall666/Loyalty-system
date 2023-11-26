@@ -37,7 +37,10 @@ func (s *service) CredentialsGetter(ctx context.Context, user string) (string, s
 
 func (s *service) OrderSetter(ctx context.Context, userId, orderNumber string) error {
 	err := s.db.OrderSetter(ctx, userId, orderNumber)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *service) GetOrders(ctx context.Context, userId string) ([]dto.FullOrder, error) {
@@ -50,6 +53,22 @@ func (s *service) GetOrders(ctx context.Context, userId string) ([]dto.FullOrder
 
 func (s *service) GetUserBalance(ctx context.Context, userId string) (*dto.UserBalance, error) {
 	balance, err := s.db.GetUserBalance(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return balance, nil
+}
+
+func (s *service) ProcessOrder(ctx context.Context, order, userId string, sum float32) error {
+	err := s.db.ProcessOrder(ctx, order, userId, sum)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *service) GetWithdrawals(ctx context.Context, userId string) (*dto.Billing, error) {
+	balance, err := s.db.GetWithdrawals(ctx, userId)
 	if err != nil {
 		return nil, err
 	}

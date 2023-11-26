@@ -17,3 +17,14 @@ type UserBalance struct {
 	Current   float32
 	Withdrawn float32
 }
+
+type WithdrawOrder struct {
+	Order string
+	Sum   float32
+}
+
+type Billing struct {
+	Order       string  `json:"order"`
+	Sum         float32 `json:"sum"`
+	ProcessedAt string  `json:"processed_at"`
+}

@@ -34,17 +34,20 @@ func (g *GetOrdersHandler) GetOrdersHandler(w http.ResponseWriter, r *http.Reque
 	}
 	userId := r.Context().Value("UserID").(string)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
 	orders, err := g.OrdersGetter.GetOrders(ctx, userId)
 	if err != nil {
-		g.log.LogWarning("err when getting orders list", err)
+		g.log.LogWarning("err when getting orders list:", err)
+		w.WriteHeader(http.StatusNoContent)
+		return
 	}
 
 	jsonData, err := json.Marshal(orders)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
