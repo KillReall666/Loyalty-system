@@ -24,6 +24,7 @@ func NewGetBalanceHandler(balance BalanceGetter, log *logger.Logger) *GetBalance
 	}
 }
 
+// GetUserBalanceHandler TODO: что делать когда баланс отсутствует или нулевой? Пока вернул ошибку.
 func (g *GetBalanceHandler) GetUserBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
@@ -33,11 +34,14 @@ func (g *GetBalanceHandler) GetUserBalanceHandler(w http.ResponseWriter, r *http
 	balance, err := g.BalanceGetter.GetUserBalance(context.Background(), userId)
 	if err != nil {
 		g.log.LogWarning("err when getting user balance: ", err)
+		http.Error(w, "zero balance or no information about charges", http.StatusPaymentRequired)
+		return
 	}
 
 	jsonData, err := json.Marshal(balance)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

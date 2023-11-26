@@ -3,6 +3,7 @@ package addorder
 import (
 	"context"
 	"fmt"
+	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/ShiraazMoollatjie/goluhn"
 	"io"
 	"net/http"
@@ -13,16 +14,18 @@ import (
 type AddOrderHandler struct {
 	addOrder    AddOrder
 	RedisClient *redis.RedisClient
+	Log         *logger.Logger
 }
 
 type AddOrder interface {
 	OrderSetter(ctx context.Context, userId, orderNumber string) error
 }
 
-func NewPutOrderNumberHandler(order AddOrder, redis *redis.RedisClient) *AddOrderHandler {
+func NewPutOrderNumberHandler(order AddOrder, redis *redis.RedisClient, log *logger.Logger) *AddOrderHandler {
 	return &AddOrderHandler{
 		addOrder:    order,
 		RedisClient: redis,
+		Log:         log,
 	}
 }
 
@@ -49,8 +52,9 @@ func (a *AddOrderHandler) AddOrderNumberHandler(w http.ResponseWriter, r *http.R
 
 	err = a.addOrder.OrderSetter(context.Background(), userId, orderNumber)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusOK)
-		fmt.Println("error when add order handler: ", err)
+		http.Error(w, err.Error(), http.StatusConflict)
+		a.Log.LogWarning("error when add order handler: ", err)
+		return
 	} else {
 		w.WriteHeader(http.StatusAccepted)
 		fmt.Fprint(w, "order added")

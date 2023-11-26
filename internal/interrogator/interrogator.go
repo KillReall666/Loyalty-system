@@ -27,12 +27,14 @@ func (i *Interrogator) OrderStatusWorker() {
 	if err != nil {
 		i.log.LogWarning("err when getting orders list from db: ", err)
 	}
+
 	for j := 0; j < len(orders); j++ {
 		status, accrual, err := i.GetOrderStatusFromACCRUAL(orders[j])
 		if err != nil {
-			i.log.LogWarning("Error retrieving order status from ACCRUAL: %v\n", err)
+			i.log.LogWarning("Error retrieving order status from ACCRUAL: ", err)
 			return
 		}
+
 		switch status {
 		case "PROCESSED":
 			// Переместить заказ в базу данных с новым статусом (PROCESSED)
@@ -76,7 +78,7 @@ func (i *Interrogator) GetOrderStatusFromACCRUAL(orderNumber string) (string, fl
 	var order dto.FullOrder
 	err = json.Unmarshal(body, &order)
 	if err != nil {
-		i.log.LogWarning("err when parse JSON:", err)
+		i.log.LogWarning("err when parse JSON in Interrogator:", err)
 		return "", 0, err
 	}
 	return order.OrderStatus, order.Accrual, nil

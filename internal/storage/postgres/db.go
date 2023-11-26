@@ -29,8 +29,9 @@ const createUserOrdersTableQuery = `
 	UserId VARCHAR(255),
 	OrderNumber VARCHAR(255),
 	Status VARCHAR(255),
-	Accrual DOUBLE PRECISION,
-	OrderDate VARCHAR(255) DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+	Accrual DOUBLE PRECISION DEFAULT 0 NOT NULL,
+	OrderDate VARCHAR(255) DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'
+		 ),
 	FOREIGN KEY (UserId) REFERENCES users(UserId),
 	CONSTRAINT unique_order UNIQUE (OrderNumber)
 	    );
@@ -39,11 +40,22 @@ const createUserOrdersTableQuery = `
 const createUserBalanceTableQuery = `
 	CREATE TABLE IF NOT EXISTS user_balance (
 	    UserID VARCHAR(255),
-	    Current DOUBLE PRECISION,
+	    Current DOUBLE PRECISION DEFAULT 0 NOT NULL,
 	    CONSTRAINT user_balance_userId_unique UNIQUE (UserId),
-	    Withdrawn DOUBLE PRECISION
+	    Withdrawn DOUBLE PRECISION DEFAULT 0 NOT NULL 
 	);
 	`
+
+const createBillingTableQuery = `
+CREATE TABLE IF NOT EXISTS billing (
+    UserID VARCHAR(255),
+    OrderNumber VARCHAR(255),
+    Sum DOUBLE PRECISION, 
+    Processed_at VARCHAR(255) DEFAULT TO_CHAR(CURRENT_TIMESTAMP, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+    FOREIGN KEY (UserId) REFERENCES users(UserId),
+    CONSTRAINT unique_order_number UNIQUE (OrderNumber)
+);
+`
 
 func NewDB(connString string) (*Database, error) {
 	conn, err := pgxpool.New(context.Background(), connString)
@@ -64,6 +76,11 @@ func NewDB(connString string) (*Database, error) {
 	_, err = conn.Exec(context.Background(), createUserBalanceTableQuery)
 	if err != nil {
 		return nil, fmt.Errorf("error creating user balance table: %v", err)
+	}
+
+	_, err = conn.Exec(context.Background(), createBillingTableQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error creating billing table: %v", err)
 	}
 
 	return &Database{db: conn}, nil
