@@ -6,6 +6,7 @@ import (
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/interrogator"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
+	"github.com/KillReall666/Loyalty-system/internal/util"
 	"net/http"
 	"time"
 )
@@ -32,7 +33,11 @@ func (g *GetOrdersHandler) GetOrdersHandler(w http.ResponseWriter, r *http.Reque
 	if r.Method != http.MethodGet {
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 	}
-	userID := r.Context().Value("UserID").(string)
+
+	userID, ok := util.GetCallerFromContext(r.Context())
+	if !ok {
+		g.log.LogWarning("could not get caller from context")
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 

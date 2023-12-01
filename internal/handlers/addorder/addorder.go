@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
+	"github.com/KillReall666/Loyalty-system/internal/util"
 	"github.com/ShiraazMoollatjie/goluhn"
 	"io"
 	"net/http"
@@ -56,7 +57,10 @@ func (a *AddOrderHandler) AddOrderNumberHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	userID := r.Context().Value(key).(string)
+	userID, ok := util.GetCallerFromContext(r.Context())
+	if !ok {
+		a.Log.LogWarning("could not get caller from context")
+	}
 
 	err = a.addOrder.OrderSetter(context.Background(), userID, orderNumber)
 	if err != nil {

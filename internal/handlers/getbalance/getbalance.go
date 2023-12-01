@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
+	"github.com/KillReall666/Loyalty-system/internal/util"
 	"net/http"
 )
 
@@ -30,7 +31,11 @@ func (g *GetBalanceHandler) GetUserBalanceHandler(w http.ResponseWriter, r *http
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 		return
 	}
-	userID := r.Context().Value("UserID").(string)
+	userID, ok := util.GetCallerFromContext(r.Context())
+	if !ok {
+		g.log.LogWarning("could not get caller from context")
+	}
+
 	balance, err := g.BalanceGetter.GetUserBalance(context.Background(), userID)
 	if err != nil {
 		g.log.LogWarning("err when getting user balance: ", err)

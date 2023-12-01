@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/KillReall666/Loyalty-system/internal/storage/redis"
+	"github.com/KillReall666/Loyalty-system/internal/util"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/golang-jwt/jwt/v4/request"
 	"net/http"
@@ -15,11 +16,9 @@ type JWTMiddleware struct {
 	Log         *logger.Logger
 }
 
-/*
-type key string
+//type key string
 
-var contextKey = key("UserID")
-*/
+//var RequestIDKey = key("UserID")
 
 func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -59,7 +58,7 @@ func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), "UserID", userID)
+			ctx := context.WithValue(r.Context(), util.ContextKeyDeleteCaller, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 

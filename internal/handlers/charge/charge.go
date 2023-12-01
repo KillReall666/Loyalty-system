@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
+	"github.com/KillReall666/Loyalty-system/internal/util"
 	"io"
 	"net/http"
 )
@@ -45,7 +46,8 @@ func (c *ChargeHandler) ChargeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.Context().Value("UserID").(string)
+	//userID := r.Context().Value("UserID").(string)
+	userID, _ := util.GetCallerFromContext(r.Context())
 
 	err = c.Charge.ProcessOrder(context.Background(), orderData.Order, userID, orderData.Sum)
 	if err != nil {
