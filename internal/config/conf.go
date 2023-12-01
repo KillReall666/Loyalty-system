@@ -12,8 +12,8 @@ type RunConfig struct {
 }
 
 const (
-	defaultServer  = ":8080"
-	defaultConnStr = "host=localhost user=Mr8 password=Rammstein12! dbname=loyalty_system sslmode=disable"
+	defaultServer  = "" //":8080"
+	defaultConnStr = "" //"host=localhost user=Mr8 password=Rammstein12! dbname=loyalty_system sslmode=disable"
 )
 
 func LoadConfig() RunConfig {
