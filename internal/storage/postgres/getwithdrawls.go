@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
-	"time"
 )
 
 func (d *Database) GetWithdrawals(ctx context.Context, userID string) ([]*dto.Billing, error) {
@@ -27,7 +26,7 @@ func (d *Database) GetWithdrawals(ctx context.Context, userID string) ([]*dto.Bi
 		if err != nil {
 			return nil, err
 		}
-		billing.ProcessedAt.Format(time.RFC3339)
+		//billing.ProcessedAt.Format(time.RFC3339)
 		orders = append(orders, &billing)
 	}
 

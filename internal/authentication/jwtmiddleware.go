@@ -15,7 +15,11 @@ type JWTMiddleware struct {
 	Log         *logger.Logger
 }
 
-var key = "UserID"
+/*
+type key string
+
+var contextKey = key("UserID")
+*/
 
 func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -54,7 +58,8 @@ func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			ctx := context.WithValue(r.Context(), key, userID)
+
+			ctx := context.WithValue(r.Context(), "UserID", userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 

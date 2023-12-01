@@ -56,9 +56,9 @@ func (a *AddOrderHandler) AddOrderNumberHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	userId := r.Context().Value(key).(string)
+	userID := r.Context().Value(key).(string)
 
-	err = a.addOrder.OrderSetter(context.Background(), userId, orderNumber)
+	err = a.addOrder.OrderSetter(context.Background(), userID, orderNumber)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrOrderExists):

@@ -70,6 +70,9 @@ func (reg *RegisterHandler) RegistrationHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 	token, err = authentication.BuildJWTString(idString)
+	if err != nil {
+		reg.log.LogWarning("err when get JWT token while registration:", err)
+	}
 
 	err = reg.RedisClient.Set(idString, token)
 	if err != nil {

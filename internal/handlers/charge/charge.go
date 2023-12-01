@@ -16,7 +16,7 @@ type ChargeHandler struct {
 }
 
 type Charger interface {
-	ProcessOrder(ctx context.Context, order, userId string, sum float32) error
+	ProcessOrder(ctx context.Context, order, userID string, sum float32) error
 }
 
 func NewChargeHandler(charge Charger, log *logger.Logger) *ChargeHandler {
@@ -45,9 +45,9 @@ func (c *ChargeHandler) ChargeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId := r.Context().Value("UserID").(string)
+	userID := r.Context().Value("UserID").(string)
 
-	err = c.Charge.ProcessOrder(context.Background(), orderData.Order, userId, orderData.Sum)
+	err = c.Charge.ProcessOrder(context.Background(), orderData.Order, userID, orderData.Sum)
 	if err != nil {
 		c.Log.LogWarning("err when add withdraw to db: ", err)
 		http.Error(w, "This order already exist, try another one.", http.StatusUnprocessableEntity)
