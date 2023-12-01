@@ -16,7 +16,7 @@ type GetWithdrawHandler struct {
 }
 
 type GetWithDrawer interface {
-	GetWithdrawals(ctx context.Context, userId string) (*dto.Billing, error)
+	GetWithdrawals(ctx context.Context, userId string) ([]*dto.Billing, error)
 }
 
 func NewGetWithdrawHandler(getwd GetWithDrawer, log *logger.Logger) *GetWithdrawHandler {

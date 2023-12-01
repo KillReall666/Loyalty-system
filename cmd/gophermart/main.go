@@ -34,10 +34,11 @@ func main() {
 	log.LogInfo("database connected")
 
 	redisClient := redis.NewRedisClient()
-	err = redisClient.Ping()
+	pong, err := redisClient.Ping()
 	if err != nil {
 		log.LogWarning("redis connection error:", err)
 	}
+	log.LogInfo("Connection to redis established:", pong)
 
 	JWTMiddleware := authentication.JWTMiddleware{
 		RedisClient: redisClient,
@@ -50,10 +51,9 @@ func main() {
 	go func() {
 		for {
 			interrog.OrderStatusWorker()
-			time.Sleep(5 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}()
-
 	r := chi.NewRouter()
 
 	r.Use(log.MyLogger)

@@ -30,8 +30,8 @@ func (d *Database) ProcessOrder(ctx context.Context, order, userId string, sum f
 
 	// Вставляем информацию о заказе в таблицу billing
 	insertBillingQuery := `
-        INSERT INTO billing (userId, ordernumber, sum, processed_at)
-        VALUES ($1, $2, $3, NOW())
+        INSERT INTO billing (userId, ordernumber, sum)
+        VALUES ($1, $2, $3)
     `
 	_, err = d.db.Exec(ctx, insertBillingQuery, userId, order, sum)
 	if err != nil {

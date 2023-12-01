@@ -67,7 +67,7 @@ func (s *service) ProcessOrder(ctx context.Context, order, userId string, sum fl
 	return nil
 }
 
-func (s *service) GetWithdrawals(ctx context.Context, userId string) (*dto.Billing, error) {
+func (s *service) GetWithdrawals(ctx context.Context, userId string) ([]*dto.Billing, error) {
 	balance, err := s.db.GetWithdrawals(ctx, userId)
 	if err != nil {
 		return nil, err

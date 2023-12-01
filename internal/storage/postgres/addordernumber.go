@@ -2,26 +2,26 @@ package postgres
 
 import (
 	"context"
-	"errors"
-	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/KillReall666/Loyalty-system/internal/handlers/addorder"
+	"github.com/jackc/pgx/v5"
 )
 
 func (d *Database) OrderSetter(ctx context.Context, userId, orderNumber string) error {
-	insertQuery := `
-                INSERT INTO user_orders (userid, orderNumber, status)
-				VALUES ($1, $2, $3)
-            `
-
-	_, err := d.db.Exec(ctx, insertQuery, userId, orderNumber, "NEW")
+	var existingUserID string
+	selectQuery := `SELECT userid FROM user_orders WHERE orderNumber = $1 LIMIT 1`
+	err := d.db.QueryRow(ctx, selectQuery, orderNumber).Scan(&existingUserID)
 	if err != nil {
-		if pgErr, ok := err.(*pgconn.PgError); ok {
-			if pgErr.Code == "23505" {
-				return errors.New("this order already exists, please try another one")
-			} else {
-				return err
-			}
+		if err == pgx.ErrNoRows {
+			insertQuery := `INSERT INTO user_orders (userid, orderNumber, status) VALUES ($1, $2, $3)`
+			_, err = d.db.Exec(ctx, insertQuery, userId, orderNumber, "NEW")
+			return err
 		}
+		return err
 	}
 
-	return nil
+	if existingUserID != userId {
+		return addorder.ErrDifferentUser
+	}
+
+	return addorder.ErrOrderExists
 }

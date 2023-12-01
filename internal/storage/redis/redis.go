@@ -2,7 +2,6 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -22,15 +21,14 @@ func NewRedisClient() *RedisClient {
 	}
 }
 
-func (rc *RedisClient) Ping() error {
+func (rc *RedisClient) Ping() (string, error) {
 	ctx := context.Background()
 	pong, err := rc.client.Ping(ctx).Result()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Println("Connection to redis established:", pong)
-	return nil
+	return pong, nil
 }
 
 func (rc *RedisClient) Set(key, value string) error {

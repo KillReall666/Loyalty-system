@@ -34,13 +34,13 @@ func (g *GetOrdersHandler) GetOrdersHandler(w http.ResponseWriter, r *http.Reque
 	}
 	userId := r.Context().Value("UserID").(string)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 
 	orders, err := g.OrdersGetter.GetOrders(ctx, userId)
 	if err != nil {
 		g.log.LogWarning("err when getting orders list:", err)
-		w.WriteHeader(http.StatusNoContent)
+		http.Error(w, err.Error(), http.StatusNoContent)
 		return
 	}
 

@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type Order struct {
 	UserId      string
 	OrderNumber string
@@ -24,7 +26,7 @@ type WithdrawOrder struct {
 }
 
 type Billing struct {
-	Order       string  `json:"order"`
-	Sum         float32 `json:"sum"`
-	ProcessedAt string  `json:"processed_at"`
+	Order       string    `json:"order"`
+	Sum         float32   `json:"sum"`
+	ProcessedAt time.Time `json:"processed_at"`
 }

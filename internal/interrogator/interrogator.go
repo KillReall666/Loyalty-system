@@ -8,6 +8,7 @@ import (
 	"github.com/KillReall666/Loyalty-system/internal/storage/postgres"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Interrogator struct {
@@ -23,7 +24,9 @@ func NewInterrogator(db *postgres.Database, log *logger.Logger) *Interrogator {
 }
 
 func (i *Interrogator) OrderStatusWorker() {
-	orders, err := i.db.GetOrderNumbers(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	orders, err := i.db.GetOrderNumbers(ctx)
 	if err != nil {
 		i.log.LogWarning("err when getting orders list from db: ", err)
 	}
@@ -39,14 +42,14 @@ func (i *Interrogator) OrderStatusWorker() {
 		case "PROCESSED":
 			// Переместить заказ в базу данных с новым статусом (PROCESSED)
 			userId := i.UpdateOrderStatusInDB(orders[j], "PROCESSED", accrual)
-			err = i.db.IncrementCurrent(context.Background(), userId, accrual)
+			err = i.db.IncrementCurrent(ctx, userId, accrual)
 			if err != nil {
 				i.log.LogWarning("err when add user balance: ", err)
 			}
 		case "INVALID":
 			// Переместить заказ в базу данных с новым статусом (INVALID)
 			userId := i.UpdateOrderStatusInDB(orders[j], "INVALID", accrual)
-			err = i.db.IncrementCurrent(context.Background(), userId, accrual)
+			err = i.db.IncrementCurrent(ctx, userId, accrual)
 			if err != nil {
 				i.log.LogWarning("err when add user balance: ", err)
 			}
@@ -86,7 +89,10 @@ func (i *Interrogator) GetOrderStatusFromACCRUAL(orderNumber string) (string, fl
 
 // UpdateOrderStatusInDB TODO: что делать с контекстом?
 func (i *Interrogator) UpdateOrderStatusInDB(orderNumber string, newStatus string, accrual float32) string {
-	userId, err := i.db.StatusSetter(context.Background(), orderNumber, newStatus, accrual)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	userId, err := i.db.StatusSetter(ctx, orderNumber, newStatus, accrual)
 	if err != nil {
 		i.log.LogWarning("err when trying update order status", err)
 	}

@@ -3,6 +3,7 @@ package charge
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"io"
@@ -48,8 +49,12 @@ func (c *ChargeHandler) ChargeHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = c.Charge.ProcessOrder(context.Background(), orderData.Order, userId, orderData.Sum)
 	if err != nil {
-		c.Log.LogWarning("in handler: ", err)
+		c.Log.LogWarning("err when add withdraw to db: ", err)
+		http.Error(w, "This order already exist, try another one.", http.StatusUnprocessableEntity)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Order added.")
 
 }

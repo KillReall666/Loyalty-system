@@ -1,6 +1,8 @@
 package postgres
 
-import "context"
+import (
+	"context"
+)
 
 func (d *Database) GetOrderNumbers(ctx context.Context) ([]string, error) {
 	query := `
@@ -24,6 +26,5 @@ func (d *Database) GetOrderNumbers(ctx context.Context) ([]string, error) {
 		}
 		orderNumbers = append(orderNumbers, orderNumber)
 	}
-
 	return orderNumbers, nil
 }
