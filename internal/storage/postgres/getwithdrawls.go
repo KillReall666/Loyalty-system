@@ -36,4 +36,5 @@ func (d *Database) GetWithdrawals(ctx context.Context, userId string) ([]*dto.Bi
 	}
 
 	return orders, nil
+
 }

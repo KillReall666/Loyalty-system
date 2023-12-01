@@ -35,6 +35,7 @@ func (g *GetOrdersHandler) GetOrdersHandler(w http.ResponseWriter, r *http.Reque
 	userId := r.Context().Value("UserID").(string)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
+
 	defer cancel()
 
 	orders, err := g.OrdersGetter.GetOrders(ctx, userId)
