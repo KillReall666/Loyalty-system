@@ -7,14 +7,14 @@ import (
 	"time"
 )
 
-func (d *Database) GetWithdrawals(ctx context.Context, userId string) ([]*dto.Billing, error) {
+func (d *Database) GetWithdrawals(ctx context.Context, userID string) ([]*dto.Billing, error) {
 	getOrdersQuery := `
 		SELECT  ordernumber, sum, processed_at
 		FROM billing
 		WHERE userid = $1
 		ORDER BY processed_at ASC
 `
-	rows, err := d.db.Query(ctx, getOrdersQuery, userId)
+	rows, err := d.db.Query(ctx, getOrdersQuery, userID)
 	if err != nil {
 		return nil, err
 	}

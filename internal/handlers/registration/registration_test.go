@@ -58,7 +58,7 @@ func TestRegisterHandler_NewRegistrationHandler(t *testing.T) {
 			reg := &RegisterHandler{
 				setUser: setUser,
 			}
-			reg.NewRegistrationHandler(tt.args.w, tt.args.r)
+			reg.RegistrationHandler(tt.args.w, tt.args.r)
 		})
 	}
 }

@@ -18,7 +18,7 @@ func (u *User) SetPassword(password string) error {
 	return nil
 }
 
-func (u *User) ComparePassword(hashedPasswordFromDb, password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPasswordFromDb), []byte(password))
+func (u *User) ComparePassword(hashedPasswordFromDB, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPasswordFromDB), []byte(password))
 	return err == nil
 }

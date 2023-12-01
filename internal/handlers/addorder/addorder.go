@@ -17,6 +17,8 @@ var (
 	ErrDifferentUser = errors.New("another user has already placed an order with this number")
 )
 
+var key = "UserID"
+
 type AddOrderHandler struct {
 	addOrder    AddOrder
 	RedisClient *redis.RedisClient
@@ -24,7 +26,7 @@ type AddOrderHandler struct {
 }
 
 type AddOrder interface {
-	OrderSetter(ctx context.Context, userId, orderNumber string) error
+	OrderSetter(ctx context.Context, userID, orderNumber string) error
 }
 
 func NewPutOrderNumberHandler(order AddOrder, redis *redis.RedisClient, log *logger.Logger) *AddOrderHandler {
@@ -54,7 +56,7 @@ func (a *AddOrderHandler) AddOrderNumberHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	userId := r.Context().Value("UserID").(string)
+	userId := r.Context().Value(key).(string)
 
 	err = a.addOrder.OrderSetter(context.Background(), userId, orderNumber)
 	if err != nil {

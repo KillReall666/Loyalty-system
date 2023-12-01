@@ -35,40 +35,40 @@ func (s *service) CredentialsGetter(ctx context.Context, user string) (string, s
 	return hashPassword, id, err
 }
 
-func (s *service) OrderSetter(ctx context.Context, userId, orderNumber string) error {
-	err := s.db.OrderSetter(ctx, userId, orderNumber)
+func (s *service) OrderSetter(ctx context.Context, userID, orderNumber string) error {
+	err := s.db.OrderSetter(ctx, userID, orderNumber)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *service) GetOrders(ctx context.Context, userId string) ([]dto.FullOrder, error) {
-	orders, err := s.db.GetOrders(ctx, userId)
+func (s *service) GetOrders(ctx context.Context, userID string) ([]dto.FullOrder, error) {
+	orders, err := s.db.GetOrders(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	return orders, err
 }
 
-func (s *service) GetUserBalance(ctx context.Context, userId string) (*dto.UserBalance, error) {
-	balance, err := s.db.GetUserBalance(ctx, userId)
+func (s *service) GetUserBalance(ctx context.Context, userID string) (*dto.UserBalance, error) {
+	balance, err := s.db.GetUserBalance(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	return balance, nil
 }
 
-func (s *service) ProcessOrder(ctx context.Context, order, userId string, sum float32) error {
-	err := s.db.ProcessOrder(ctx, order, userId, sum)
+func (s *service) ProcessOrder(ctx context.Context, order, userID string, sum float32) error {
+	err := s.db.ProcessOrder(ctx, order, userID, sum)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *service) GetWithdrawals(ctx context.Context, userId string) ([]*dto.Billing, error) {
-	balance, err := s.db.GetWithdrawals(ctx, userId)
+func (s *service) GetWithdrawals(ctx context.Context, userID string) ([]*dto.Billing, error) {
+	balance, err := s.db.GetWithdrawals(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

@@ -14,7 +14,7 @@ type GetBalanceHandler struct {
 }
 
 type BalanceGetter interface {
-	GetUserBalance(ctx context.Context, userId string) (*dto.UserBalance, error)
+	GetUserBalance(ctx context.Context, userID string) (*dto.UserBalance, error)
 }
 
 func NewGetBalanceHandler(balance BalanceGetter, log *logger.Logger) *GetBalanceHandler {
@@ -30,8 +30,8 @@ func (g *GetBalanceHandler) GetUserBalanceHandler(w http.ResponseWriter, r *http
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 		return
 	}
-	userId := r.Context().Value("UserID").(string)
-	balance, err := g.BalanceGetter.GetUserBalance(context.Background(), userId)
+	userID := r.Context().Value("UserID").(string)
+	balance, err := g.BalanceGetter.GetUserBalance(context.Background(), userID)
 	if err != nil {
 		g.log.LogWarning("err when getting user balance: ", err)
 		http.Error(w, "zero balance or no information about charges", http.StatusPaymentRequired)

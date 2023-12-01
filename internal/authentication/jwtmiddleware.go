@@ -15,6 +15,8 @@ type JWTMiddleware struct {
 	Log         *logger.Logger
 }
 
+var key = "UserID"
+
 func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		jwtCheck := func(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +36,7 @@ func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 					w.WriteHeader(http.StatusUnauthorized)
 					return nil, fmt.Errorf("unexpected signing token method: %v", t.Header["alg"])
 				}
-				return []byte(SECRET_KEY), nil
+				return []byte(SecretKey), nil
 			})
 			if err != nil {
 				j.Log.LogWarning("err when parse jwt: %v", err)
@@ -52,7 +54,7 @@ func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			ctx := context.WithValue(r.Context(), "UserID", userID)
+			ctx := context.WithValue(r.Context(), key, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 

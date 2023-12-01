@@ -15,8 +15,10 @@ type GetWithdrawHandler struct {
 	Log         *logger.Logger
 }
 
+var key = "UserID"
+
 type GetWithDrawer interface {
-	GetWithdrawals(ctx context.Context, userId string) ([]*dto.Billing, error)
+	GetWithdrawals(ctx context.Context, userID string) ([]*dto.Billing, error)
 }
 
 func NewGetWithdrawHandler(getwd GetWithDrawer, log *logger.Logger) *GetWithdrawHandler {
@@ -30,12 +32,12 @@ func (g *GetWithdrawHandler) GetWithdrawHandler(w http.ResponseWriter, r *http.R
 	if r.Method != http.MethodGet {
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 	}
-	userId := r.Context().Value("UserID").(string)
+	userID := r.Context().Value(key).(string)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	orders, err := g.GetWithDraw.GetWithdrawals(ctx, userId)
+	orders, err := g.GetWithDraw.GetWithdrawals(ctx, userID)
 	if err != nil {
 		g.Log.LogWarning("err when getting data from db:", err)
 		fmt.Fprintf(w, "") //идет двойная запись в заголовок, в запросе к бд getwithdrawals errors.New()

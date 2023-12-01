@@ -12,19 +12,19 @@ type claims struct {
 
 // TODO: засунуть ключ в переменную окружения
 const (
-	TOKEN_EXP  = time.Hour * 3
-	SECRET_KEY = "supersecretkey"
+	TokenExp  = time.Hour * 3
+	SecretKey = "SuperSecretKey"
 )
 
 func BuildJWTString(id string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TOKEN_EXP)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExp)),
 		},
 		UserID: id,
 	})
 
-	tokenString, err := token.SignedString([]byte(SECRET_KEY))
+	tokenString, err := token.SignedString([]byte(SecretKey))
 	if err != nil {
 		return "", err
 	}

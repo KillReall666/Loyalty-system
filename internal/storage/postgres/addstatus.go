@@ -13,8 +13,8 @@ func (d *Database) StatusSetter(ctx context.Context, orderNumber, orderStatus st
                 WHERE orderNumber = $1
 				RETURNING userid
             `
-	var userId string
-	err := d.db.QueryRow(ctx, insertQuery, orderNumber, orderStatus, accrual).Scan(&userId)
+	var userID string
+	err := d.db.QueryRow(ctx, insertQuery, orderNumber, orderStatus, accrual).Scan(&userID)
 	if err != nil {
 		if pgErr, ok := err.(*pgconn.PgError); ok {
 			if pgErr.Code == "23505" {
@@ -25,5 +25,5 @@ func (d *Database) StatusSetter(ctx context.Context, orderNumber, orderStatus st
 		}
 	}
 
-	return userId, nil
+	return userID, nil
 }

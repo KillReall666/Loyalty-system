@@ -13,28 +13,18 @@ type UserSetter struct {
 	mock.Mock
 }
 
-// UserSetter provides a mock function with given fields: ctx, user, password
-func (_m *UserSetter) UserSetter(ctx context.Context, user string, password string) (int, error) {
-	ret := _m.Called(ctx, user, password)
+// UserSetter provides a mock function with given fields: ctx, user, password, id
+func (_m *UserSetter) UserSetter(ctx context.Context, user string, password string, id string) error {
+	ret := _m.Called(ctx, user, password, id)
 
-	var r0 int
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (int, error)); ok {
-		return rf(ctx, user, password)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) int); ok {
-		r0 = rf(ctx, user, password)
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) error); ok {
+		r0 = rf(ctx, user, password, id)
 	} else {
-		r0 = ret.Get(0).(int)
+		r0 = ret.Error(0)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, user, password)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewUserSetter creates a new instance of UserSetter. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

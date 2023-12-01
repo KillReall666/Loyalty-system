@@ -6,20 +6,20 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (d *Database) OrderSetter(ctx context.Context, userId, orderNumber string) error {
+func (d *Database) OrderSetter(ctx context.Context, userID, orderNumber string) error {
 	var existingUserID string
 	selectQuery := `SELECT userid FROM user_orders WHERE orderNumber = $1 LIMIT 1`
 	err := d.db.QueryRow(ctx, selectQuery, orderNumber).Scan(&existingUserID)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			insertQuery := `INSERT INTO user_orders (userid, orderNumber, status) VALUES ($1, $2, $3)`
-			_, err = d.db.Exec(ctx, insertQuery, userId, orderNumber, "NEW")
+			_, err = d.db.Exec(ctx, insertQuery, userID, orderNumber, "NEW")
 			return err
 		}
 		return err
 	}
 
-	if existingUserID != userId {
+	if existingUserID != userID {
 		return addorder.ErrDifferentUser
 	}
 

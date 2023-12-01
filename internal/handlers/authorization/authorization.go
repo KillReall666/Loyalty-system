@@ -55,15 +55,21 @@ func (a *AuthHandler) AuthorizationHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	hashPasswordFromDb, id, err := a.checkUser.CredentialsGetter(ctx, user.Username)
+	hashPasswordFromDB, id, err := a.checkUser.CredentialsGetter(ctx, user.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	var token string
-	if user.ComparePassword(hashPasswordFromDb, user.PasswordHash) {
+
+	if user.ComparePassword(hashPasswordFromDB, user.PasswordHash) {
 		token, err = authentication.BuildJWTString(id)
+		if err != nil {
+			a.log.LogWarning("err when get JWT token when authorization", err)
+			return
+		}
+
 		w.Header().Set("Authorization", token)
 		err = a.RedisClient.Set(id, token)
 		if err != nil {

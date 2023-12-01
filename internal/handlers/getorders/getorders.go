@@ -17,7 +17,7 @@ type GetOrdersHandler struct {
 }
 
 type OrdersGetter interface {
-	GetOrders(ctx context.Context, userId string) ([]dto.FullOrder, error)
+	GetOrders(ctx context.Context, userID string) ([]dto.FullOrder, error)
 }
 
 func NewGetOrdersHandler(ord OrdersGetter, log *logger.Logger, interrogator *interrogator.Interrogator) *GetOrdersHandler {
@@ -32,13 +32,13 @@ func (g *GetOrdersHandler) GetOrdersHandler(w http.ResponseWriter, r *http.Reque
 	if r.Method != http.MethodGet {
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 	}
-	userId := r.Context().Value("UserID").(string)
+	userID := r.Context().Value("UserID").(string)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 
 	defer cancel()
 
-	orders, err := g.OrdersGetter.GetOrders(ctx, userId)
+	orders, err := g.OrdersGetter.GetOrders(ctx, userID)
 	if err != nil {
 		g.log.LogWarning("err when getting orders list:", err)
 		http.Error(w, err.Error(), http.StatusNoContent)

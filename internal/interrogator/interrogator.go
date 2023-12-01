@@ -41,15 +41,15 @@ func (i *Interrogator) OrderStatusWorker() {
 		switch status {
 		case "PROCESSED":
 			// Переместить заказ в базу данных с новым статусом (PROCESSED)
-			userId := i.UpdateOrderStatusInDB(orders[j], "PROCESSED", accrual)
-			err = i.db.IncrementCurrent(ctx, userId, accrual)
+			userID := i.UpdateOrderStatusInDB(orders[j], "PROCESSED", accrual)
+			err = i.db.IncrementCurrent(ctx, userID, accrual)
 			if err != nil {
 				i.log.LogWarning("err when add user balance: ", err)
 			}
 		case "INVALID":
 			// Переместить заказ в базу данных с новым статусом (INVALID)
-			userId := i.UpdateOrderStatusInDB(orders[j], "INVALID", accrual)
-			err = i.db.IncrementCurrent(ctx, userId, accrual)
+			userID := i.UpdateOrderStatusInDB(orders[j], "INVALID", accrual)
+			err = i.db.IncrementCurrent(ctx, userID, accrual)
 			if err != nil {
 				i.log.LogWarning("err when add user balance: ", err)
 			}
@@ -92,10 +92,10 @@ func (i *Interrogator) UpdateOrderStatusInDB(orderNumber string, newStatus strin
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	userId, err := i.db.StatusSetter(ctx, orderNumber, newStatus, accrual)
+	userID, err := i.db.StatusSetter(ctx, orderNumber, newStatus, accrual)
 	if err != nil {
 		i.log.LogWarning("err when trying update order status", err)
 	}
 	i.log.LogInfo("Order", orderNumber, "updated in the database with status", newStatus)
-	return userId
+	return userID
 }

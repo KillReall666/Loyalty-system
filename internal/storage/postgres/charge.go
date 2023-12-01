@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (d *Database) ProcessOrder(ctx context.Context, order, userId string, sum float32) error {
+func (d *Database) ProcessOrder(ctx context.Context, order, userID string, sum float32) error {
 	// Проверяем баланс в таблице user_balance
 	checkBalanceQuery := `
         SELECT current
@@ -30,10 +30,10 @@ func (d *Database) ProcessOrder(ctx context.Context, order, userId string, sum f
 
 	// Вставляем информацию о заказе в таблицу billing
 	insertBillingQuery := `
-        INSERT INTO billing (userId, ordernumber, sum)
+        INSERT INTO billing (userID, ordernumber, sum)
         VALUES ($1, $2, $3)
     `
-	_, err = d.db.Exec(ctx, insertBillingQuery, userId, order, sum)
+	_, err = d.db.Exec(ctx, insertBillingQuery, userID, order, sum)
 	if err != nil {
 		return fmt.Errorf("failed to insert billing record: %s", err)
 	}

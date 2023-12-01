@@ -5,7 +5,7 @@ import (
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 )
 
-func (d *Database) GetOrders(ctx context.Context, userId string) ([]dto.FullOrder, error) {
+func (d *Database) GetOrders(ctx context.Context, userID string) ([]dto.FullOrder, error) {
 	getOrdersQuery := `
 		SELECT  ordernumber, status, COALESCE(accrual, 0) AS accrual, orderdate
 		FROM user_orders 
@@ -13,7 +13,7 @@ func (d *Database) GetOrders(ctx context.Context, userId string) ([]dto.FullOrde
 		ORDER BY orderdate DESC 
 `
 
-	rows, err := d.db.Query(ctx, getOrdersQuery, userId)
+	rows, err := d.db.Query(ctx, getOrdersQuery, userID)
 	if err != nil {
 		return nil, err
 	}
