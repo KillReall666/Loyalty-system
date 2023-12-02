@@ -28,6 +28,7 @@ func LoadConfig() RunConfig {
 	flag.StringVar(&cfg.DefaultDBConnStr, "d", defaultConnStr, "connection string")
 	flag.StringVar(&cfg.AccrualAddress, "r", defaultAccrualAddress, "accrual connection string")
 	flag.StringVar(&cfg.RedisAddress, "m", defaultRedisAddress, "redis connection string")
+
 	flag.Parse()
 
 	err := env.Parse(&cfg)

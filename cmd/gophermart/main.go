@@ -33,7 +33,7 @@ func main() {
 		log.LogWarning(err)
 	}
 	log.LogInfo("database connected")
-	
+
 	redisClient := redis.NewRedisClient(cfg.RedisAddress)
 	pong, err := redisClient.Ping()
 	if err != nil {
@@ -48,7 +48,7 @@ func main() {
 
 	app := loyaltysystemservice.NewService(db)
 
-	interrog := interrogator.NewInterrogator(db, log)
+	interrog := interrogator.NewInterrogator(db, log, cfg)
 	go func() {
 		for {
 			interrog.OrderStatusWorker()

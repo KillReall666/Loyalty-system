@@ -3,6 +3,7 @@ package interrogator
 import (
 	"context"
 	"encoding/json"
+	"github.com/KillReall666/Loyalty-system/internal/config"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/KillReall666/Loyalty-system/internal/storage/postgres"
@@ -14,12 +15,14 @@ import (
 type Interrogator struct {
 	db  *postgres.Database
 	log *logger.Logger
+	cfg config.RunConfig
 }
 
-func NewInterrogator(db *postgres.Database, log *logger.Logger) *Interrogator {
+func NewInterrogator(db *postgres.Database, log *logger.Logger, cfg config.RunConfig) *Interrogator {
 	return &Interrogator{
 		db:  db,
 		log: log,
+		cfg: cfg,
 	}
 }
 
@@ -61,7 +64,7 @@ func (i *Interrogator) OrderStatusWorker() {
 }
 
 func (i *Interrogator) GetOrderStatusFromACCRUAL(orderNumber string) (string, float32, error) {
-	req, err := http.NewRequest("GET", "http://localhost:8888/api/orders/"+orderNumber, nil)
+	req, err := http.NewRequest("GET", i.cfg.AccrualAddress+"/api/orders/"+orderNumber, nil)
 	if err != nil {
 		i.log.LogWarning("err when create GET request: ", err)
 	}
