@@ -53,6 +53,12 @@ jobs:
           fileName: "*"
           out-file-path: .tools
 
+      - name: Connect to Redis
+        run: node client.js
+        env:
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
+
       - name: Setup autotest binary
         run: |
           chmod -R +x $GITHUB_WORKSPACE/.tools
