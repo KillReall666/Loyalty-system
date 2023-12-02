@@ -61,11 +61,6 @@ jobs:
           (cd cmd/gophermart && go build -buildvcs=false -o gophermart)
           (cd cmd/accrual && chmod +x accrual_linux_amd64)
 
-      - name: Set up Redis
-        uses: redis-actions/setup-redis@v1
-        with:
-        redis-version: '6.x'
-
       - name: Test
         run: |
           gophermarttest \
