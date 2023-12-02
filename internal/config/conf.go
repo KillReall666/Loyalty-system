@@ -2,20 +2,23 @@ package config
 
 import (
 	"flag"
-	"github.com/caarlos0/env"
 	"log"
+
+	"github.com/caarlos0/env"
 )
 
 type RunConfig struct {
 	Address          string `env:"RUN_ADDRESS"`
 	DefaultDBConnStr string `env:"DATABASE_URI"`
 	AccrualAddress   string `env:"ACCRUAL_SYSTEM_ADDRESS"`
+	RedisAddress     string `env:"REDIS_URI"`
 }
 
 const (
 	defaultServer         = "" //":8080"
 	defaultConnStr        = "host=localhost port=5432 user=Mr8 password=Rammstein12! dbname=loyalty_system sslmode=disable"
 	defaultAccrualAddress = ""
+	defaultRedisAddress   = "redis:6379"
 )
 
 func LoadConfig() RunConfig {
@@ -24,6 +27,7 @@ func LoadConfig() RunConfig {
 	flag.StringVar(&cfg.Address, "a", defaultServer, "server address [host:port]")
 	flag.StringVar(&cfg.DefaultDBConnStr, "d", defaultConnStr, "connection string")
 	flag.StringVar(&cfg.AccrualAddress, "r", defaultAccrualAddress, "accrual connection string")
+	flag.StringVar(&cfg.RedisAddress, "m", defaultRedisAddress, "redis connection string")
 	flag.Parse()
 
 	err := env.Parse(&cfg)
