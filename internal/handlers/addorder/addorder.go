@@ -18,8 +18,6 @@ var (
 	ErrDifferentUser = errors.New("another user has already placed an order with this number")
 )
 
-var key = "UserID"
-
 type AddOrderHandler struct {
 	addOrder    AddOrder
 	RedisClient *redis.RedisClient

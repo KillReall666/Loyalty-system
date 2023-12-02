@@ -7,15 +7,15 @@ import (
 )
 
 type RunConfig struct {
-	Address          string `env:"ADDRESS"`
-	DefaultDBConnStr string `env:"DATABASE_DSN"`
+	Address          string `env:"RUN_ADDRESS"`
+	DefaultDBConnStr string `env:"DATABASE_URI"`
 	AccrualAddress   string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
 
 const (
-	defaultServer  = "" //":8080"
-	defaultConnStr = "" //"host=localhost user=Mr8 password=Rammstein12! dbname=loyalty_system sslmode=disable"
-	defaultAccrualAddress
+	defaultServer         = "" //":8080"
+	defaultConnStr        = "host=localhost port=5432 user=Mr8 password=Rammstein12! dbname=loyalty_system sslmode=disable"
+	defaultAccrualAddress = ""
 )
 
 func LoadConfig() RunConfig {
