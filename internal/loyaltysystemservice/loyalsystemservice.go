@@ -2,6 +2,7 @@ package loyaltysystemservice
 
 import (
 	"context"
+
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/storage/postgres"
 )

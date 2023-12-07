@@ -17,11 +17,11 @@ type RunConfig struct {
 const (
 	defaultServer         = "" //":8080"
 	defaultConnStr        = "host=localhost port=5432 user=Mr8 password=Rammstein12! dbname=loyalty_system sslmode=disable"
-	defaultAccrualAddress = ""
-	defaultRedisAddress   = "redis:6379"
+	defaultAccrualAddress = "http://localhost:8888" //delete this before push
+	defaultRedisAddress   = "localhost:6379"        //localhost
 )
 
-func LoadConfig() RunConfig {
+func Load() RunConfig {
 	cfg := RunConfig{}
 
 	flag.StringVar(&cfg.Address, "a", defaultServer, "server address [host:port]")

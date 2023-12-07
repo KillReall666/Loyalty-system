@@ -23,12 +23,13 @@ import (
 )
 
 func main() {
-	cfg := config.LoadConfig()
+	cfg := config.Load()
 	log, err := logger.InitLogger()
 	if err != nil {
 		panic("couldn't init logger")
 	}
-	db, err := postgres.NewDB(cfg.DefaultDBConnStr)
+
+	db, err := postgres.New(cfg.DefaultDBConnStr)
 	if err != nil {
 		log.LogWarning(err)
 	}
@@ -61,30 +62,15 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Use(JWTMiddleware.JWTMiddleware())
-		r.Post(
-			"/api/user/orders",
-			addorder.NewPutOrderNumberHandler(app, redisClient, log).AddOrderNumberHandler,
-		)
-		r.Get(
-			"/api/user/orders",
-			getorders.NewGetOrdersHandler(app, log, interrog).GetOrdersHandler,
-		)
+		r.Post("/api/user/orders", addorder.NewPutOrderNumberHandler(app, redisClient, log).AddOrderNumberHandler)
+		r.Get("/api/user/orders", getorders.NewGetOrdersHandler(app, log, interrog).GetOrdersHandler)
 		r.Get("/api/user/balance", getbalance.NewGetBalanceHandler(app, log).GetUserBalanceHandler)
 		r.Post("/api/user/balance/withdraw", charge.NewChargeHandler(app, log).ChargeHandler)
-		r.Get(
-			"/api/user/withdrawals",
-			getwithdraw.NewGetWithdrawHandler(app, log).GetWithdrawHandler,
-		)
+		r.Get("/api/user/withdrawals", getwithdraw.NewGetWithdrawHandler(app, log).GetWithdrawHandler)
 	})
 
-	r.Post(
-		"/api/user/register",
-		registration.NewRegistrationHandler(app, redisClient, log).RegistrationHandler,
-	)
-	r.Post(
-		"/api/user/login",
-		authorization.NewAuthorizationHandler(app, redisClient, log).AuthorizationHandler,
-	)
+	r.Post("/api/user/register", registration.NewRegistrationHandler(app, redisClient, log).RegistrationHandler)
+	r.Post("/api/user/login", authorization.NewAuthorizationHandler(app, redisClient, log).AuthorizationHandler)
 
 	log.LogInfo("starting server at localhost", cfg.Address)
 	err = http.ListenAndServe(cfg.Address, r)

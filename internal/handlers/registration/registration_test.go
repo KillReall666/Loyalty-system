@@ -1,13 +1,15 @@
 package registration
 
 import (
-	"github.com/KillReall666/Loyalty-system/internal/handlers/registration/mocks"
-	"github.com/stretchr/testify/mock"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/mock"
+
+	"github.com/KillReall666/Loyalty-system/internal/handlers/registration/mocks"
 )
 
 func TestRegisterHandler_NewRegistrationHandler(t *testing.T) {

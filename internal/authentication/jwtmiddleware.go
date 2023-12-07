@@ -3,12 +3,13 @@ package authentication
 import (
 	"context"
 	"fmt"
-	"github.com/KillReall666/Loyalty-system/internal/logger"
-	"github.com/KillReall666/Loyalty-system/internal/storage/redis"
-	"github.com/KillReall666/Loyalty-system/internal/util"
+	"net/http"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/golang-jwt/jwt/v4/request"
-	"net/http"
+
+	"github.com/KillReall666/Loyalty-system/internal/logger"
+	"github.com/KillReall666/Loyalty-system/internal/storage/redis"
 )
 
 type JWTMiddleware struct {
@@ -19,7 +20,7 @@ type JWTMiddleware struct {
 func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		jwtCheck := func(w http.ResponseWriter, r *http.Request) {
-			//получаем jwt из заголовка
+			//get JWT from header
 			extractor := request.AuthorizationHeaderExtractor
 			extToken, err := extractor.ExtractToken(r)
 			if err != nil {
@@ -28,9 +29,9 @@ func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 				return
 			}
 			claim := &claims{}
-			//Проверяем подлинность jwt
+			//check jwt identity
 			_, err = jwt.ParseWithClaims(extToken, claim, func(t *jwt.Token) (interface{}, error) {
-				//Проверка заголовка алгоритма токена. Заголовок должен совпадать с тем, который использует сервер для подписи и проверки токенов.
+				//Checking the token algorithm header. The header must match the one the server uses to sign and validate tokens.
 				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 					w.WriteHeader(http.StatusUnauthorized)
 					return nil, fmt.Errorf("unexpected signing token method: %v", t.Header["alg"])
@@ -54,7 +55,7 @@ func (j *JWTMiddleware) JWTMiddleware() func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), util.ContextKeyDeleteCaller, userID)
+			ctx := context.WithValue(r.Context(), ContextKeyDeleteCaller, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -13,7 +14,6 @@ type Database struct {
 	db *pgxpool.Pool
 }
 
-// TODO: Разобраться в какой длине лучше хранить uuid
 const createUsersTableQuery = `
       CREATE TABLE IF NOT EXISTS users (
     UserId VARCHAR(255) PRIMARY KEY,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS billing (
 );
 `
 
-func NewDB(connString string) (*Database, error) {
+func New(connString string) (*Database, error) {
 	conn, err := pgxpool.New(context.Background(), connString)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to db: %v", err)

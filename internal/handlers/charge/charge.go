@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/KillReall666/Loyalty-system/internal/dto"
-	"github.com/KillReall666/Loyalty-system/internal/logger"
-	"github.com/KillReall666/Loyalty-system/internal/util"
 	"io"
 	"net/http"
+
+	"github.com/KillReall666/Loyalty-system/internal/authentication"
+	"github.com/KillReall666/Loyalty-system/internal/dto"
+	"github.com/KillReall666/Loyalty-system/internal/logger"
 )
 
 type ChargeHandler struct {
@@ -42,17 +43,16 @@ func (c *ChargeHandler) ChargeHandler(w http.ResponseWriter, r *http.Request) {
 	var orderData dto.WithdrawOrder
 	err = json.Unmarshal(body, &orderData)
 	if err != nil {
-		http.Error(w, "Failed tro decode JSON data", http.StatusBadRequest)
+		http.Error(w, "failed tro decode JSON data", http.StatusBadRequest)
 		return
 	}
 
-	//userID := r.Context().Value("UserID").(string)
-	userID, _ := util.GetCallerFromContext(r.Context())
+	userID, _ := authentication.GetUserIDFromCtx(r.Context())
 
 	err = c.Charge.ProcessOrder(context.Background(), orderData.Order, userID, orderData.Sum)
 	if err != nil {
 		c.Log.LogWarning("err when add withdraw to db: ", err)
-		http.Error(w, "This order already exist, try another one.", http.StatusUnprocessableEntity)
+		http.Error(w, "this order already exist, try another one", http.StatusUnprocessableEntity)
 		return
 	}
 

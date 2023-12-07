@@ -3,10 +3,11 @@ package getbalance
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+
+	"github.com/KillReall666/Loyalty-system/internal/authentication"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
-	"github.com/KillReall666/Loyalty-system/internal/util"
-	"net/http"
 )
 
 type GetBalanceHandler struct {
@@ -25,13 +26,12 @@ func NewGetBalanceHandler(balance BalanceGetter, log *logger.Logger) *GetBalance
 	}
 }
 
-// GetUserBalanceHandler TODO: что делать когда баланс отсутствует или нулевой? Пока вернул ошибку.
 func (g *GetBalanceHandler) GetUserBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 		return
 	}
-	userID, ok := util.GetCallerFromContext(r.Context())
+	userID, ok := authentication.GetUserIDFromCtx(r.Context())
 	if !ok {
 		g.log.LogWarning("could not get caller from context")
 	}

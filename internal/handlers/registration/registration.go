@@ -5,13 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/google/uuid"
+
 	"github.com/KillReall666/Loyalty-system/internal/authentication"
 	"github.com/KillReall666/Loyalty-system/internal/credentials"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/KillReall666/Loyalty-system/internal/storage/redis"
-	"github.com/google/uuid"
-	"net/http"
-	"time"
 )
 
 type RegisterHandler struct {

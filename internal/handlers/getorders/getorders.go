@@ -3,12 +3,13 @@ package getorders
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/KillReall666/Loyalty-system/internal/authentication"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/interrogator"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
-	"github.com/KillReall666/Loyalty-system/internal/util"
-	"net/http"
-	"time"
 )
 
 type GetOrdersHandler struct {
@@ -34,7 +35,7 @@ func (g *GetOrdersHandler) GetOrdersHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 	}
 
-	userID, ok := util.GetCallerFromContext(r.Context())
+	userID, ok := authentication.GetUserIDFromCtx(r.Context())
 	if !ok {
 		g.log.LogWarning("could not get caller from context")
 	}

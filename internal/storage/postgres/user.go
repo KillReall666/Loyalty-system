@@ -3,9 +3,27 @@ package postgres
 import (
 	"context"
 	"fmt"
+
 	"github.com/KillReall666/Loyalty-system/internal/dto"
+
 	"github.com/jackc/pgx/v5"
 )
+
+func (d *Database) AddUserBalance(ctx context.Context, userID string, value float32) error {
+	insertQuery := `
+        INSERT INTO user_balance (userID, current)
+        VALUES ($1, $2)
+        ON CONFLICT (userId)
+        DO UPDATE SET current = user_balance.current + $2
+    `
+
+	_, err := d.db.Exec(ctx, insertQuery, userID, value)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (d *Database) GetUserBalance(ctx context.Context, userID string) (*dto.UserBalance, error) {
 	query := `

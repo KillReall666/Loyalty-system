@@ -3,13 +3,15 @@ package interrogator
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+
 	"github.com/KillReall666/Loyalty-system/internal/config"
 	"github.com/KillReall666/Loyalty-system/internal/dto"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/KillReall666/Loyalty-system/internal/storage/postgres"
-	"io"
-	"net/http"
-	"time"
 )
 
 type Interrogator struct {
@@ -45,14 +47,14 @@ func (i *Interrogator) OrderStatusWorker() {
 		case "PROCESSED":
 			// Переместить заказ в базу данных с новым статусом (PROCESSED)
 			userID := i.UpdateOrderStatusInDB(orders[j], "PROCESSED", accrual)
-			err = i.db.IncrementCurrent(ctx, userID, accrual)
+			err = i.db.AddUserBalance(ctx, userID, accrual)
 			if err != nil {
 				i.log.LogWarning("err when add user balance: ", err)
 			}
 		case "INVALID":
 			// Переместить заказ в базу данных с новым статусом (INVALID)
 			userID := i.UpdateOrderStatusInDB(orders[j], "INVALID", accrual)
-			err = i.db.IncrementCurrent(ctx, userID, accrual)
+			err = i.db.AddUserBalance(ctx, userID, accrual)
 			if err != nil {
 				i.log.LogWarning("err when add user balance: ", err)
 			}
@@ -81,6 +83,7 @@ func (i *Interrogator) GetOrderStatusFromACCRUAL(orderNumber string) (string, fl
 	if err != nil {
 		i.log.LogWarning("err when read response body: ", err)
 	}
+	fmt.Println("BODY:", string(body))
 	var order dto.FullOrder
 	err = json.Unmarshal(body, &order)
 	if err != nil {

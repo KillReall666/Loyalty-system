@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/KillReall666/Loyalty-system/internal/logger"
-	"github.com/KillReall666/Loyalty-system/internal/util"
-	"github.com/ShiraazMoollatjie/goluhn"
 	"io"
 	"net/http"
 
+	"github.com/KillReall666/Loyalty-system/internal/authentication"
+	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/KillReall666/Loyalty-system/internal/storage/redis"
+
+	"github.com/ShiraazMoollatjie/goluhn"
 )
 
 var (
@@ -55,7 +56,7 @@ func (a *AddOrderHandler) AddOrderNumberHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	userID, ok := util.GetCallerFromContext(r.Context())
+	userID, ok := authentication.GetUserIDFromCtx(r.Context())
 	if !ok {
 		a.Log.LogWarning("could not get caller from context")
 	}
@@ -64,11 +65,11 @@ func (a *AddOrderHandler) AddOrderNumberHandler(w http.ResponseWriter, r *http.R
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrOrderExists):
-			http.Error(w, "This order already exists", http.StatusOK)
+			http.Error(w, "this order already exists", http.StatusOK)
 		case errors.Is(err, ErrDifferentUser):
-			http.Error(w, "Another user has already placed an order with this number", http.StatusConflict)
+			http.Error(w, "another user has already placed an order with this number", http.StatusConflict)
 		default:
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
 		}
 		return
 	}

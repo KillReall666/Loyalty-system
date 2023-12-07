@@ -1,8 +1,9 @@
 package authentication
 
 import (
-	"github.com/golang-jwt/jwt/v4"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type claims struct {
@@ -10,7 +11,6 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-// TODO: засунуть ключ в переменную окружения
 const (
 	TokenExp  = time.Hour * 3
 	SecretKey = "SuperSecretKey"

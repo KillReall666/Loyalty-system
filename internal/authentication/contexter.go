@@ -1,4 +1,4 @@
-package util
+package authentication
 
 import "context"
 
@@ -12,8 +12,8 @@ var (
 	ContextKeyDeleteCaller = contextKey("UserID")
 )
 
-// GetCallerFromContext gets the caller value from the context.
-func GetCallerFromContext(ctx context.Context) (string, bool) {
+// GetUserIDFromCtx gets the caller value from the context.
+func GetUserIDFromCtx(ctx context.Context) (string, bool) {
 	caller, ok := ctx.Value(ContextKeyDeleteCaller).(string)
 	return caller, ok
 }

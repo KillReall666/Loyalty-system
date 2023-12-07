@@ -6,12 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/KillReall666/Loyalty-system/internal/authentication"
 	"github.com/KillReall666/Loyalty-system/internal/credentials"
 	"github.com/KillReall666/Loyalty-system/internal/logger"
 	"github.com/KillReall666/Loyalty-system/internal/storage/redis"
-	"net/http"
-	"time"
 )
 
 type AuthHandler struct {
@@ -32,7 +33,6 @@ func NewAuthorizationHandler(ch CredentialsChecker, redis *redis.RedisClient, lo
 	}
 }
 
-// AuthenticationHandler TODO: Скорее всего это должен быть мидлтварь
 func (a *AuthHandler) AuthorizationHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "only POST requests support!", http.StatusNotFound)

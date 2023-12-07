@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/KillReall666/Loyalty-system/internal/dto"
-	"github.com/KillReall666/Loyalty-system/internal/logger"
-	"github.com/KillReall666/Loyalty-system/internal/util"
 	"net/http"
 	"time"
+
+	"github.com/KillReall666/Loyalty-system/internal/authentication"
+	"github.com/KillReall666/Loyalty-system/internal/dto"
+	"github.com/KillReall666/Loyalty-system/internal/logger"
 )
 
 type GetWithdrawHandler struct {
@@ -34,7 +35,7 @@ func (g *GetWithdrawHandler) GetWithdrawHandler(w http.ResponseWriter, r *http.R
 		http.Error(w, "only GET requests support!", http.StatusNotFound)
 	}
 
-	userID, ok := util.GetCallerFromContext(r.Context())
+	userID, ok := authentication.GetUserIDFromCtx(r.Context())
 	if !ok {
 		g.Log.LogWarning("could not get caller from context")
 	}
@@ -44,7 +45,7 @@ func (g *GetWithdrawHandler) GetWithdrawHandler(w http.ResponseWriter, r *http.R
 	orders, err := g.GetWithDraw.GetWithdrawals(ctx, userID)
 	if err != nil {
 		g.Log.LogWarning("err when getting data from db:", err)
-		fmt.Fprintf(w, "") //идет двойная запись в заголовок, в запросе к бд getwithdrawals errors.New()
+		fmt.Fprintf(w, "")
 		http.Error(w, err.Error(), http.StatusNoContent)
 		return
 	}
