@@ -26,6 +26,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      redis:
+        image: redis:6.2.8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,10 +40,11 @@ jobs:
       - name: Download autotests binaries
         uses: robinraju/release-downloader@v1.8
         with:
-          repository: Yandex-Practicum/go-autotests-bin
-          tag: "v0.9.16"
+          repository: Yandex-Practicum/go-autotests
+          latest: true
           fileName: "*"
           out-file-path: .tools
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup autotest binary
         run: |
@@ -50,6 +58,8 @@ jobs:
           (cd cmd/accrual && chmod +x accrual_linux_amd64)
 
       - name: Test
+        env:
+          REDIS_URI: redis:6379
         run: |
           gophermarttest \
             -test.v -test.run=^TestGophermart$ \

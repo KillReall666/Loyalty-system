@@ -1,0 +1,3 @@
+#!/bin/bash
+go build -o ./cmd/gophermart/gophermart ./cmd/gophermart
+./gophermarttest-darwin-amd64 -gophermart-binary-path=cmd/gophermart/gophermart -accrual-binary-path=cmd/accrual/accrual_darwin_amd64 -gophermart-database-uri="host=localhost user=Mr8 password=Rammstein12! dbname=loyalty_system sslmode=disable"  -gophermart-host="localhost" -accrual-database-uri=-"localhost" -gophermart-port="8080" -accrual-host="localhost" -accrual-port="8888"
